@@ -1,7 +1,6 @@
-import bcrypt from 'bcrypt-nodejs';
-import crypto from 'crypto';
 import mongoose from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+
 import { UserModel, UserRole } from './User';
 import { TimesheetModel } from './Timesheet';
 
@@ -41,7 +40,7 @@ const projectSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true, usePushEach: true }
 );
 
 projectSchema.plugin(autoIncrement.plugin, {

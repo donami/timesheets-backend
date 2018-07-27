@@ -1,10 +1,13 @@
 import { Response, Request, NextFunction } from 'express';
 
-import { default as User, UserModel } from '../models/User';
+import { default as User, UserModel, UserRole } from '../models/User';
+import Project from '../models/Project';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.find().populate('timesheets');
+    const users = await User.find()
+      .populate('timesheets')
+      .populate('timesheets');
 
     return res.json(users);
   } catch (error) {
@@ -14,7 +17,9 @@ export let list = async (req: Request, res: Response, next: NextFunction) => {
 
 export let find = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findOne({ id: req.params.id });
+    const user = await User.findOne({ id: req.params.id }).populate(
+      'timesheets'
+    );
 
     return res.json(user);
   } catch (error) {
@@ -23,12 +28,38 @@ export let find = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export let create = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password, role } = req.body;
+  const {
+    email,
+    firstname,
+    lastname,
+    password,
+    role,
+    projects: projectIds,
+  } = req.body;
 
   try {
-    const user = new User({ email, password, role });
+    const user = new User({
+      email,
+      password,
+      firstname,
+      lastname,
+      role: role || UserRole.User,
+    });
 
     const savedUser = await user.save();
+
+    const projects = await Project.find({ id: { $in: projectIds } });
+
+    const projectPromises = projects.map((project: any) => {
+      project.members.push({
+        user: savedUser._id,
+        role: role || UserRole.User,
+      });
+
+      return project.save();
+    });
+
+    await Promise.all(projectPromises);
 
     return res.json(savedUser);
   } catch (error) {

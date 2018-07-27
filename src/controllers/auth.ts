@@ -6,7 +6,7 @@ export let auth = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email, password });
+    const user = await User.findOne({ email, password }).populate('timesheets');
 
     return res.json(user);
   } catch (error) {

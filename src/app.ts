@@ -27,6 +27,8 @@ import * as timesheetController from './controllers/timesheet';
 import * as userController from './controllers/user';
 import * as expenseReportController from './controllers/expense-report';
 import * as authController from './controllers/auth';
+import * as timesheetTemplateController from './controllers/timesheet-template';
+import * as groupController from './controllers/group';
 
 // API keys and Passport configuration
 
@@ -127,11 +129,25 @@ app.get('/api/users', userController.list);
 app.post('/api/users', userController.create);
 app.delete('/api/users', userController.remove);
 
+app.get('/api/timesheet-templates/:id', timesheetTemplateController.find);
+app.put('/api/timesheet-templates/:id', timesheetTemplateController.update);
+app.get('/api/timesheet-templates', timesheetTemplateController.list);
+app.post('/api/timesheet-templates', timesheetTemplateController.create);
+app.delete('/api/timesheet-templates', timesheetTemplateController.remove);
+
+app.put('/api/groups/update-group-member', groupController.updateGroupMember);
+app.get('/api/groups/:id', groupController.find);
+app.put('/api/groups/:id', groupController.update);
+app.get('/api/groups', groupController.list);
+app.post('/api/groups', groupController.create);
+app.delete('/api/groups', groupController.remove);
+
 app.get('/api/timesheets/:id', timesheetController.find);
 app.put('/api/timesheets/:id', timesheetController.update);
 app.get('/api/timesheets', timesheetController.list);
 app.post('/api/timesheets', timesheetController.create);
 app.delete('/api/timesheets', timesheetController.remove);
+app.post('/api/timesheets/create-timesheets', timesheetController.createMany);
 
 app.get('/api/expense-reports/:id', expenseReportController.find);
 app.put('/api/expense-reports/:id', expenseReportController.update);

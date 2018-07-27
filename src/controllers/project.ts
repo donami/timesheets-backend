@@ -1,6 +1,7 @@
 import { Response, Request, NextFunction } from 'express';
 
 import { default as Project, ProjectModel } from '../models/Project';
+import User, { UserRole } from '../models/User';
 
 export let getProjects = async (
   req: Request,
@@ -8,7 +9,15 @@ export let getProjects = async (
   next: NextFunction
 ) => {
   try {
-    const projects = await Project.find().populate('timesheets');
+    const projects = await Project.find()
+      .populate({
+        path: 'members.user',
+        populate: {
+          path: 'timesheets',
+          model: 'Timesheet',
+        },
+      })
+      .populate('timesheets');
 
     return res.json(projects);
   } catch (error) {
@@ -22,7 +31,9 @@ export let findProject = async (
   next: NextFunction
 ) => {
   try {
-    const project = await Project.findOne({ id: req.params.id });
+    const project = await Project.findOne({ id: req.params.id }).populate(
+      'timesheets members.user'
+    );
 
     return res.json(project);
   } catch (error) {
@@ -35,10 +46,22 @@ export let createProject = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name } = req.body;
+  const { name, userId } = req.body;
 
   try {
-    const project = new Project({ name });
+    const user = await User.findOne({ id: userId });
+
+    if (!user) {
+      throw new Error(`Unable to find user with id: ${userId}.`);
+    }
+
+    const project: any = new Project({ name });
+    project.members = [
+      {
+        user: user._id,
+        role: UserRole.Admin,
+      },
+    ];
 
     const savedProject = await project.save();
 

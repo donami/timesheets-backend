@@ -1,5 +1,3 @@
-import bcrypt from 'bcrypt-nodejs';
-import crypto from 'crypto';
 import mongoose from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 
@@ -15,13 +13,27 @@ export enum TimesheetStatus {
 
 export type TimesheetModel = mongoose.Document & {
   periodEnd: string;
+  periodStart: string;
   status: TimesheetStatus;
   dateApproved?: string;
   dates?: any[];
 };
 
+const dateSchema = new mongoose.Schema(
+  {
+    date: String,
+    hours: Number,
+    expected: Number,
+  },
+  { usePushEach: true }
+);
+
 const timesheetSchema = new mongoose.Schema(
   {
+    periodStart: {
+      type: String,
+      required: true,
+    },
     periodEnd: {
       type: String,
       required: true,
@@ -34,14 +46,9 @@ const timesheetSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    dates: [
-      {
-        type: String,
-        default: [],
-      },
-    ],
+    dates: [[dateSchema]],
   },
-  { timestamps: true }
+  { timestamps: true, usePushEach: true }
 );
 
 timesheetSchema.plugin(autoIncrement.plugin, {

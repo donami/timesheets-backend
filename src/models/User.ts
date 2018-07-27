@@ -7,17 +7,30 @@ autoIncrement.initialize(mongoose.connection);
 
 export enum UserRole {
   User = 'USER',
+  Manager = 'MANAGER',
   Admin = 'ADMIN',
 }
 
 export type UserModel = mongoose.Document & {
+  firstname: string;
+  lastname: string;
   email: string;
   password: string;
   role: UserRole;
+  image: string;
+  timesheets: any;
 };
 
 const userSchema = new mongoose.Schema(
   {
+    firstname: {
+      type: String,
+      required: true,
+    },
+    lastname: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       unique: true,
@@ -27,12 +40,22 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    image: {
+      type: String,
+      default: '',
+    },
     role: {
       type: String,
       default: UserRole.User,
     },
+    timesheets: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Timesheet',
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true, usePushEach: true }
 );
 
 userSchema.plugin(autoIncrement.plugin, {
