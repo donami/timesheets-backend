@@ -88,11 +88,13 @@ export const timesheets = [
     _id: '5b294c3c00cdca62587cb457',
     periodEnd: '30-Jun-2018',
     status: TimesheetStatus.InProgressSaved,
+    owner: '5b294c3c00cdca62587cb456',
   },
   {
     _id: '5b294c3c00cdca62587cb458',
     periodEnd: '31-Jul-2018',
     status: TimesheetStatus.InProgress,
+    owner: '5b294c3c00cdca62587cb456',
   },
 ];
 
@@ -147,6 +149,7 @@ export const projects: any[] = [
         role: UserRole.User,
       },
     ],
+    groups: ['5b2bc67b7ee7ad2e78f35a39', '5b2bc67b7ee7ad2e78f35a38'],
   },
   {
     _id: '5b294aa07cebb86524184675',

@@ -40,6 +40,16 @@ groupSchema.plugin(autoIncrement.plugin, {
   field: 'id',
 });
 
+const autoPopulate = function(next: any) {
+  this.populate('timesheetTemplate members');
+
+  next();
+};
+
+groupSchema.pre('findById', autoPopulate);
+groupSchema.pre('findOne', autoPopulate);
+groupSchema.pre('find', autoPopulate);
+
 // export const Group: GroupType = mongoose.model<GroupType>('Group', groupSchema);
 const Group = mongoose.model('Group', groupSchema);
 export default Group;

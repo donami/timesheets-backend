@@ -9,15 +9,9 @@ export let getProjects = async (
   next: NextFunction
 ) => {
   try {
-    const projects = await Project.find()
-      .populate({
-        path: 'members.user',
-        populate: {
-          path: 'timesheets',
-          model: 'Timesheet',
-        },
-      })
-      .populate('timesheets');
+    const { user } = req;
+
+    const projects = await Project.find({ 'members.user': { $in: user._id } });
 
     return res.json(projects);
   } catch (error) {
@@ -31,9 +25,12 @@ export let findProject = async (
   next: NextFunction
 ) => {
   try {
-    const project = await Project.findOne({ id: req.params.id }).populate(
-      'timesheets members.user'
-    );
+    const { user } = req;
+
+    const project = await Project.findOne({
+      id: req.params.id,
+      'members.user': { $in: user._id },
+    });
 
     return res.json(project);
   } catch (error) {
@@ -79,7 +76,12 @@ export let updateProject = async (
   const { name } = req.body;
 
   try {
-    const project = <ProjectModel>await Project.findOne({ id: req.params.id });
+    const { user } = req;
+
+    const project = <ProjectModel>await Project.findOne({
+      id: req.params.id,
+      'members.user': { $in: user._id },
+    });
 
     project.name = name;
 
@@ -99,7 +101,10 @@ export let removeProject = async (
   const { projectId } = req.body;
 
   try {
-    const removedProject = await Project.findOneAndRemove({ id: projectId });
+    const removedProject = await Project.findOneAndRemove({
+      id: projectId,
+      'members.user': { $in: req.user._id },
+    });
 
     return res.json(removedProject);
   } catch (error) {

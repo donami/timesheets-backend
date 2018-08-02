@@ -10,7 +10,12 @@ import User from '../models/User';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const timesheets = await Timesheet.find();
+    const timesheets = await Timesheet.find().populate({
+      path: 'owner',
+      populate: {
+        path: 'timesheets',
+      },
+    });
 
     return res.json(timesheets);
   } catch (error) {
@@ -20,7 +25,12 @@ export let list = async (req: Request, res: Response, next: NextFunction) => {
 
 export let find = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const timesheet = await Timesheet.findOne({ id: req.params.id });
+    const timesheet = await Timesheet.findOne({ id: req.params.id }).populate({
+      path: 'owner',
+      populate: {
+        path: 'timesheets',
+      },
+    });
 
     return res.json(timesheet);
   } catch (error) {
@@ -61,17 +71,19 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
       });
     }
 
-    const savedTimesheet = await timesheet.save();
+    await timesheet.save();
 
-    return res.json(savedTimesheet);
+    const result = await Timesheet.findOne({ id: req.params.id }).populate(
+      'owner'
+    );
+
+    return res.json(result);
   } catch (error) {
     next(error);
   }
 };
 
 export let remove = async (req: Request, res: Response, next: NextFunction) => {
-  const { timesheetId } = req.body;
-
   try {
     const removedTimesheet = await Timesheet.findOneAndRemove({
       id: req.params.id,
@@ -101,6 +113,7 @@ export let createMany = async (
       timesheet.periodEnd = item.month; // TODO: this is actually start date, periodEnd should be removed
       timesheet.periodStart = item.month;
       timesheet.status = TimesheetStatus.InProgress;
+      timesheet.owner = user._id;
 
       item.dates.forEach((date: any) => {
         timesheet.dates.push(date);
@@ -110,7 +123,12 @@ export let createMany = async (
         user.timesheets.push(createdTimesheet._id);
         project.timesheets.push(createdTimesheet._id);
 
-        return createdTimesheet;
+        return await Timesheet.findOne({ _id: createdTimesheet._id }).populate({
+          path: 'owner',
+          populate: {
+            path: 'timesheets',
+          },
+        });
       });
     });
 

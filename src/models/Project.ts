@@ -3,6 +3,7 @@ import autoIncrement from 'mongoose-auto-increment';
 
 import { UserModel, UserRole } from './User';
 import { TimesheetModel } from './Timesheet';
+import { GroupModel } from './Group';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -16,6 +17,7 @@ export type ProjectModel = mongoose.Document & {
   name: string;
   members: ProjectMember[];
   timesheets: TimesheetModel[] | number[];
+  groups: GroupModel[];
 };
 
 const projectSchema = new mongoose.Schema(
@@ -39,6 +41,12 @@ const projectSchema = new mongoose.Schema(
         ref: 'Timesheet',
       },
     ],
+    groups: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Group',
+      },
+    ],
   },
   { timestamps: true, usePushEach: true }
 );
@@ -48,6 +56,56 @@ projectSchema.plugin(autoIncrement.plugin, {
   startAt: 1,
   field: 'id',
 });
+
+const autoPopulate = function(next: any) {
+  this.populate({
+    path: 'members.user',
+    populate: {
+      path: 'timesheets',
+      model: 'Timesheet',
+      populate: {
+        path: 'owner',
+        model: 'User',
+      },
+    },
+  });
+
+  this.populate({
+    path: 'members.user',
+    populate: {
+      path: 'group',
+    },
+  });
+
+  this.populate('timesheets groups');
+  this.populate({
+    path: 'groups',
+    populate: {
+      path: 'members',
+      model: 'User',
+      populate: {
+        path: 'timesheets',
+        model: 'Timesheet',
+        populate: {
+          path: 'owner',
+          model: 'User',
+        },
+      },
+    },
+  });
+  this.populate({
+    path: 'groups',
+    populate: {
+      path: 'timesheetTemplate',
+      model: 'TimesheetTemplate',
+    },
+  });
+
+  next();
+};
+
+projectSchema.pre('find', autoPopulate);
+projectSchema.pre('findOne', autoPopulate);
 
 // export const Project: ProjectType = mongoose.model<ProjectType>('Project', projectSchema);
 const Project = mongoose.model('Project', projectSchema);

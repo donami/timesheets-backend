@@ -2,7 +2,6 @@ import express from 'express';
 import compression from 'compression'; // compresses requests
 import session from 'express-session';
 import bodyParser from 'body-parser';
-import logger from './util/logger';
 import lusca from 'lusca';
 import dotenv from 'dotenv';
 import mongo from 'connect-mongo';
@@ -13,7 +12,11 @@ import passport from 'passport';
 import expressValidator from 'express-validator';
 import bluebird from 'bluebird';
 import cors from 'cors';
+import jwt from 'jsonwebtoken';
+
+import logger from './util/logger';
 import { MONGODB_URI, SESSION_SECRET } from './util/secrets';
+import jwtConfig from './config/jwt';
 
 const MongoStore = mongo(session);
 
@@ -29,6 +32,7 @@ import * as expenseReportController from './controllers/expense-report';
 import * as authController from './controllers/auth';
 import * as timesheetTemplateController from './controllers/timesheet-template';
 import * as groupController from './controllers/group';
+import { WithAuth } from './types';
 
 // API keys and Passport configuration
 
@@ -58,6 +62,8 @@ mongoose
 app.set('port', process.env.PORT || 9001);
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'pug');
+app.set('superSecret', jwtConfig.secret);
+
 app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -79,29 +85,61 @@ app.use(passport.session());
 app.use(flash());
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
-app.use((req, res, next) => {
-  res.locals.user = req.user;
-  next();
-});
-app.use((req, res, next) => {
-  // After successful login, redirect back to the intended page
-  if (
-    !req.user &&
-    req.path !== '/login' &&
-    req.path !== '/signup' &&
-    !req.path.match(/^\/auth/) &&
-    !req.path.match(/\./)
-  ) {
-    req.session.returnTo = req.path;
-  } else if (req.user && req.path == '/account') {
-    req.session.returnTo = req.path;
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   res.locals.user = req.user;
+//   next();
+})
+// app.use((req, res, next) => {
+//   // After successful login, redirect back to the intended page
+//   if (
+//     !req.user &&
+//     req.path !== '/login' &&
+//     req.path !== '/signup' &&
+//     !req.path.match(/^\/auth/) &&
+//     !req.path.match(/\./)
+//   ) {
+//     req.session.returnTo = req.path;
+//   } else if (req.user && req.path == '/account') {
+//     req.session.returnTo = req.path;
+//   }
+//   next();
+// });
 
 app.use(
   express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 })
 );
+
+app.get('/api/mock', apiController.mock);
+app.post('/api/auth', authController.auth);
+app.get('/api/verify-token', authController.verify);
+
+app.use((req: express.Request & WithAuth, res, next) => {
+  const token =
+    req.body.token || req.query.token || req.headers['x-access-token'];
+
+  if (token) {
+    return jwt.verify(
+      token,
+      app.get('superSecret'),
+      (err: any, decoded: any) => {
+        if (err) {
+          return res.json({
+            success: false,
+            message: 'Failed to authenticate token.',
+          });
+        }
+        req.user = decoded;
+
+        return next();
+      }
+    );
+  }
+
+  return res.status(403).send({
+    success: false,
+    message: 'No token provided.',
+  });
+});
 
 /**
  * API examples routes.
@@ -113,9 +151,7 @@ app.use(
 //   passportConfig.isAuthorized,
 //   apiController.getFacebook
 // );
-app.get('/api/mock', apiController.mock);
 
-app.post('/api/auth', authController.auth);
 
 app.get('/api/projects/:id', projectController.findProject);
 app.put('/api/projects/:id', projectController.updateProject);
@@ -138,9 +174,9 @@ app.delete('/api/timesheet-templates', timesheetTemplateController.remove);
 app.put('/api/groups/update-group-member', groupController.updateGroupMember);
 app.get('/api/groups/:id', groupController.find);
 app.put('/api/groups/:id', groupController.update);
-app.get('/api/groups', groupController.list);
-app.post('/api/groups', groupController.create);
-app.delete('/api/groups', groupController.remove);
+app.post('/api/groups', groupController.list);
+app.post('/api/groups/create', groupController.create);
+app.delete('/api/groups/:id', groupController.remove);
 
 app.get('/api/timesheets/:id', timesheetController.find);
 app.put('/api/timesheets/:id', timesheetController.update);

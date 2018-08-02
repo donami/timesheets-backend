@@ -1,5 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose, { Mongoose } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import { UserModel } from './User';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -17,6 +18,7 @@ export type TimesheetModel = mongoose.Document & {
   status: TimesheetStatus;
   dateApproved?: string;
   dates?: any[];
+  owner: UserModel;
 };
 
 const dateSchema = new mongoose.Schema(
@@ -47,6 +49,10 @@ const timesheetSchema = new mongoose.Schema(
       required: false,
     },
     dates: [[dateSchema]],
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
   },
   { timestamps: true, usePushEach: true }
 );
@@ -56,6 +62,20 @@ timesheetSchema.plugin(autoIncrement.plugin, {
   startAt: 1,
   field: 'id',
 });
+
+const autoPopulate = function(next: any) {
+  // this.populate({
+  //   path: 'owner',
+  //   populate: {
+  //     path: 'timesheets',
+  //   },
+  // });
+
+  next();
+};
+
+timesheetSchema.pre('find', autoPopulate);
+timesheetSchema.pre('findOne', autoPopulate);
 
 // export const Timesheet: TimesheetType = mongoose.model<TimesheetType>('Timesheet', timesheetSchema);
 const Timesheet = mongoose.model('Timesheet', timesheetSchema);

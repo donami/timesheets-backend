@@ -1,5 +1,3 @@
-import bcrypt from 'bcrypt-nodejs';
-import crypto from 'crypto';
 import mongoose from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
 
@@ -19,6 +17,7 @@ export type UserModel = mongoose.Document & {
   role: UserRole;
   image: string;
   timesheets: any;
+  fullName: string;
 };
 
 const userSchema = new mongoose.Schema(
@@ -55,13 +54,22 @@ const userSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true, usePushEach: true }
+  {
+    timestamps: true,
+    usePushEach: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 userSchema.plugin(autoIncrement.plugin, {
   model: 'User',
   startAt: 1,
   field: 'id',
+});
+
+userSchema.virtual('fullName').get(function() {
+  return `${this.firstname} ${this.lastname}`;
 });
 
 // export const User: UserType = mongoose.model<UserType>('User', userSchema);
