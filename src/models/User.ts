@@ -47,12 +47,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: UserRole.User,
     },
-    timesheets: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Timesheet',
-      },
-    ],
   },
   {
     timestamps: true,
@@ -66,6 +60,12 @@ userSchema.plugin(autoIncrement.plugin, {
   model: 'User',
   startAt: 1,
   field: 'id',
+});
+
+userSchema.virtual('timesheets', {
+  ref: 'Timesheet',
+  localField: '_id',
+  foreignField: 'owner',
 });
 
 userSchema.virtual('fullName').get(function() {

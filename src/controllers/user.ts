@@ -5,9 +5,7 @@ import Project from '../models/Project';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.find()
-      .populate('timesheets')
-      .populate('timesheets');
+    const users = await User.find().populate('timesheets');
 
     return res.json(users);
   } catch (error) {
