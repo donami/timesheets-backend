@@ -6,13 +6,13 @@ export const groups: any[] = [
   {
     _id: '5b2bc67b7ee7ad2e78f35a39',
     name: 'Software Developers',
-    members: ['5b294c3c00cdca62587cb455'],
+    project: '5b294aa07cebb86524184674',
     timesheetTemplate: '5b2feba6a0cbc871743a9240',
   },
   {
     _id: '5b2bc67b7ee7ad2e78f35a38',
     name: 'First Line Support',
-    members: ['5b294c3c00cdca62587cb456'],
+    project: '5b294aa07cebb86524184674',
   },
 ];
 
@@ -123,6 +123,7 @@ export const users = [
     lastname: 'Hederström',
     password: '123',
     role: UserRole.Admin,
+    group: '5b2bc67b7ee7ad2e78f35a39',
   },
   {
     _id: '5b294c3c00cdca62587cb456',
@@ -131,6 +132,7 @@ export const users = [
     lastname: 'Nejdefelt',
     password: '123',
     role: UserRole.User,
+    group: '5b2bc67b7ee7ad2e78f35a39',
   },
 ];
 

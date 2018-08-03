@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import autopopulate from 'mongoose-autopopulate';
+
+import { GroupModel } from './Group';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -18,6 +21,7 @@ export type UserModel = mongoose.Document & {
   image: string;
   timesheets: any;
   fullName: string;
+  group: GroupModel;
 };
 
 const userSchema = new mongoose.Schema(
@@ -47,6 +51,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: UserRole.User,
     },
+    group: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Group',
+    },
   },
   {
     timestamps: true,
@@ -55,6 +63,8 @@ const userSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+userSchema.plugin(autopopulate);
 
 userSchema.plugin(autoIncrement.plugin, {
   model: 'User',
@@ -66,6 +76,7 @@ userSchema.virtual('timesheets', {
   ref: 'Timesheet',
   localField: '_id',
   foreignField: 'owner',
+  autopopulate: { maxDepth: 5 },
 });
 
 userSchema.virtual('fullName').get(function() {

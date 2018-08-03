@@ -206,9 +206,9 @@
     "@types/mongodb" "*"
     "@types/node" "*"
 
-"@types/mongoose@^4.7.34":
-  version "4.7.36"
-  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-4.7.36.tgz#fd5f2cac4fd4b0c3831efae8824e20f1dfc09f96"
+"@types/mongoose@^5.2.3":
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.2.3.tgz#0336876383d8e37bb19309ee40774ee681f163bb"
   dependencies:
     "@types/events" "*"
     "@types/mongodb" "*"
@@ -3711,6 +3711,10 @@ mongoose-auto-increment@^5.0.1:
   resolved "https://registry.yarnpkg.com/mongoose-auto-increment/-/mongoose-auto-increment-5.0.1.tgz#827e051d9cc371dabe8bff1a704431d341cb79df"
   dependencies:
     extend "^3.0.0"
+
+mongoose-autopopulate@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/mongoose-autopopulate/-/mongoose-autopopulate-0.8.0.tgz#993107a72f4ea65fe9901eb49b8d79506e941622"
 
 mongoose-legacy-pluralize@1.0.2:
   version "1.0.2"

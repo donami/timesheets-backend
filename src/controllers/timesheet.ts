@@ -10,12 +10,7 @@ import User from '../models/User';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const timesheets = await Timesheet.find().populate({
-      path: 'owner',
-      populate: {
-        path: 'timesheets',
-      },
-    });
+    const timesheets = await Timesheet.find();
 
     return res.json(timesheets);
   } catch (error) {
@@ -25,12 +20,7 @@ export let list = async (req: Request, res: Response, next: NextFunction) => {
 
 export let find = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const timesheet = await Timesheet.findOne({ id: req.params.id }).populate({
-      path: 'owner',
-      populate: {
-        path: 'timesheets',
-      },
-    });
+    const timesheet = await Timesheet.findOne({ id: req.params.id });
 
     return res.json(timesheet);
   } catch (error) {
@@ -120,7 +110,6 @@ export let createMany = async (
       });
 
       return timesheet.save().then(async createdTimesheet => {
-        user.timesheets.push(createdTimesheet._id);
         project.timesheets.push(createdTimesheet._id);
 
         return await Timesheet.findOne({ _id: createdTimesheet._id }).populate({

@@ -19,7 +19,7 @@ export let list = async (req: Request, res: Response, next: NextFunction) => {
       options = { members: user._id };
     }
 
-    const totalCount = await Group.count({});
+    const totalCount = await Group.estimatedDocumentCount();
 
     if (req.body.except) {
       options = {
@@ -143,55 +143,18 @@ export let updateGroupMember = async (
     const user = <UserModel>await User.findOne({ id: userId });
     const group = <GroupModel>await Group.findOne({ id: groupId });
 
-    await Group.update(
-      {},
-      { $pull: { members: user._id } },
-      { upsert: true, multi: true }
-    );
+    user.group = group._id;
 
-    group.members.push(user._id);
+    await user.save();
 
-    await group.save();
-
-    const result = await Group.findOne({ id: groupId });
+    const result = await Group.findOne({ id: groupId }).populate({
+      path: 'members',
+      populate: {
+        path: 'group',
+      },
+    });
     return res.json(result);
   } catch (error) {
     next(error);
   }
-  // try {
-  //   const user = <UserModel>await User.findOne({ id: userId });
-  //   const group = <GroupModel>await Group.findOne({ id: groupId });
-
-  //   user.group = group._id;
-
-  //   await user.save();
-
-  //   const previousGroups = await Group.find({ members: user._id });
-  //   const previousGroupIds = previousGroups.map(
-  //     (group: GroupModel) => group.id
-  //   );
-
-  //   await Group.update(
-  //     {},
-  //     { $pull: { members: user._id } },
-  //     { upsert: true, multi: true }
-  //   );
-
-  //   const promises = groupIds.map(async (groupId: number) => {
-  //     const group = <GroupModel>await Group.findOne({ id: groupId });
-
-  //     group.members.push(user._id);
-  //     return group.save();
-  //   });
-
-  //   await Promise.all(promises);
-
-  //   const groups = await Group.find({
-  //     id: { $in: [...groupIds, ...previousGroupIds] },
-  //   }).populate('members timesheetTemplate');
-
-  //   return res.json(groups);
-  // } catch (error) {
-  //   next(error);
-  // }
 };

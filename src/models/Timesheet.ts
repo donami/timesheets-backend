@@ -1,5 +1,7 @@
 import mongoose, { Mongoose } from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import autopopulate from 'mongoose-autopopulate';
+
 import { UserModel } from './User';
 
 autoIncrement.initialize(mongoose.connection);
@@ -52,10 +54,13 @@ const timesheetSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      autopopulate: { maxDepth: 5 },
     },
   },
   { timestamps: true, usePushEach: true }
 );
+
+timesheetSchema.plugin(autopopulate);
 
 timesheetSchema.plugin(autoIncrement.plugin, {
   model: 'Timesheet',

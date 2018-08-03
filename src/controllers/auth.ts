@@ -20,8 +20,7 @@ export let auth = async (req: Request, res: Response, next: NextFunction) => {
     };
 
     const token = jwt.sign(payload, jwtConfig.secret, {
-      expiresIn: 1440, // expires in 24 hours
-      // expiresInMinutes: 1440 // expires in 24 hours
+      // expiresIn: 1440, // expires in 24 hours
     });
 
     return res.json({ token, data: user });

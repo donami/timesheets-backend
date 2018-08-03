@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+
 import { UserModel } from './User';
 import { TimesheetTemplateModel } from './TimesheetTemplate';
+import { ProjectModel } from '../models/Project';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -10,6 +12,7 @@ export type GroupModel = mongoose.Document & {
   name: string;
   members: UserModel[];
   timesheetTemplate: TimesheetTemplateModel;
+  project: ProjectModel;
 };
 
 const groupSchema = new mongoose.Schema(
@@ -19,19 +22,22 @@ const groupSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    members: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-    ],
     timesheetTemplate: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'TimesheetTemplate',
       default: undefined,
     },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+    },
   },
-  { timestamps: true, usePushEach: true }
+  {
+    timestamps: true,
+    usePushEach: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
 
 groupSchema.plugin(autoIncrement.plugin, {
@@ -40,8 +46,21 @@ groupSchema.plugin(autoIncrement.plugin, {
   field: 'id',
 });
 
+groupSchema.virtual('members', {
+  ref: 'User',
+  localField: '_id',
+  foreignField: 'group',
+});
+
 const autoPopulate = function(next: any) {
   this.populate('timesheetTemplate members');
+
+  this.populate({
+    path: 'members',
+    populate: {
+      path: 'timesheets',
+    },
+  });
 
   next();
 };

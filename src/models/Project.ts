@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import autoIncrement from 'mongoose-auto-increment';
+import autopopulate from 'mongoose-autopopulate';
 
 import { UserModel, UserRole } from './User';
 import { TimesheetModel } from './Timesheet';
@@ -41,15 +42,23 @@ const projectSchema = new mongoose.Schema(
         ref: 'Timesheet',
       },
     ],
-    groups: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Group',
-      },
-    ],
   },
-  { timestamps: true, usePushEach: true }
+  {
+    timestamps: true,
+    usePushEach: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+projectSchema.plugin(autopopulate);
+
+projectSchema.virtual('groups', {
+  ref: 'Group',
+  foreignField: 'project',
+  localField: '_id',
+  autopopulate: true,
+});
 
 projectSchema.plugin(autoIncrement.plugin, {
   model: 'Project',
@@ -82,13 +91,10 @@ const autoPopulate = function(next: any) {
     path: 'groups',
     populate: {
       path: 'members',
-      model: 'User',
       populate: {
         path: 'timesheets',
-        model: 'Timesheet',
         populate: {
           path: 'owner',
-          model: 'User',
         },
       },
     },
