@@ -76,6 +76,7 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
 
     const group = <GroupModel>new Group({ name, members: [] });
     group.members = [user._id];
+    group.project = project._id;
 
     if (timesheetTemplateId) {
       const timesheetTemplate = await TimesheetTemplate.findOne({
@@ -89,11 +90,7 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
 
     const savedGroup = await group.save();
 
-    project.groups.push(group._id);
-
-    await project.save();
-
-    const result = await Group.findById(savedGroup._id);
+    const result = await Group.findOne({ _id: savedGroup._id });
 
     return res.json(result);
   } catch (error) {
@@ -147,12 +144,9 @@ export let updateGroupMember = async (
 
     await user.save();
 
-    const result = await Group.findOne({ id: groupId }).populate({
-      path: 'members',
-      populate: {
-        path: 'group',
-      },
-    });
+    // TODO: probably move to user controller
+    const result = await User.findOne({ id: userId });
+
     return res.json(result);
   } catch (error) {
     next(error);

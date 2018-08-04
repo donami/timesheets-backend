@@ -32,6 +32,7 @@ const projectSchema = new mongoose.Schema(
         user: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'User',
+          autopopulate: true,
         },
         role: String,
       },
@@ -104,6 +105,13 @@ const autoPopulate = function(next: any) {
     populate: {
       path: 'timesheetTemplate',
       model: 'TimesheetTemplate',
+    },
+  });
+
+  this.populate({
+    path: 'timesheets',
+    populate: {
+      path: 'owner',
     },
   });
 

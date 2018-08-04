@@ -16,6 +16,42 @@ export const groups: any[] = [
   },
 ];
 
+export const questionArticles: any[] = [
+  {
+    _id: '5b6474c61ae30b09e5f2086e',
+    title: 'How to set password for another user',
+    teaser: 'Instructions for how to change the password for another user',
+    body:
+      'As an admin you can update the password for any user on your account. To do this go to Company > Manage Users and then click on edit. ',
+    author: '5b294c3c00cdca62587cb455',
+    access: [UserRole.User, UserRole.Manager, UserRole.Admin],
+  },
+  {
+    _id: '5b6473c78f304df6f894f994',
+    title: 'How to disable a user',
+    teaser: 'Instructions for how to disable a user',
+    body:
+      'Next goto the password field and update the password. If you decide to autogenerate the password, ClockIt will give you the option to send it to the employee once you save.',
+    author: '5b294c3c00cdca62587cb455',
+    access: [UserRole.User, UserRole.Manager, UserRole.Admin],
+  },
+];
+
+export const questionCategories: any[] = [
+  {
+    // _id: '5b2bc67b7ee7ad2e78f35a39',
+    title: 'General',
+    icon: 'fas fa-life-ring',
+    articles: [],
+  },
+  {
+    // _id: '5b2bc67b7ee7ad2e78f35a38',
+    title: 'User Management',
+    icon: 'fas fa-users',
+    articles: ['5b6474c61ae30b09e5f2086e', '5b6473c78f304df6f894f994'],
+  },
+];
+
 export const timesheetTemplates: any = [
   {
     _id: '5b2feba6a0cbc871743a9240',

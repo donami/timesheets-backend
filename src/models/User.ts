@@ -19,7 +19,7 @@ export type UserModel = mongoose.Document & {
   password: string;
   role: UserRole;
   image: string;
-  timesheets: any;
+  // timesheets: any;
   fullName: string;
   group: GroupModel;
 };
@@ -54,6 +54,7 @@ const userSchema = new mongoose.Schema(
     group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Group',
+      autopopulate: true,
     },
   },
   {
@@ -72,12 +73,12 @@ userSchema.plugin(autoIncrement.plugin, {
   field: 'id',
 });
 
-userSchema.virtual('timesheets', {
-  ref: 'Timesheet',
-  localField: '_id',
-  foreignField: 'owner',
-  autopopulate: { maxDepth: 5 },
-});
+// userSchema.virtual('timesheets', {
+//   ref: 'Timesheet',
+//   localField: '_id',
+//   foreignField: 'owner',
+//   autopopulate: { maxDepth: 5 },
+// });
 
 userSchema.virtual('fullName').get(function() {
   return `${this.firstname} ${this.lastname}`;

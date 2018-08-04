@@ -5,12 +5,7 @@ import Project from '../models/Project';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const users = await User.find().populate({
-      path: 'timesheets',
-      populate: {
-        path: 'owner',
-      },
-    });
+    const users = await User.find();
 
     return res.json(users);
   } catch (error) {
@@ -20,12 +15,7 @@ export let list = async (req: Request, res: Response, next: NextFunction) => {
 
 export let find = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const user = await User.findOne({ id: req.params.id }).populate({
-      path: 'timesheets',
-      populate: {
-        path: 'owner',
-      },
-    });
+    const user = await User.findOne({ id: req.params.id });
 
     return res.json(user);
   } catch (error) {

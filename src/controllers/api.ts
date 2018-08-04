@@ -7,6 +7,8 @@ import { default as Timesheet } from '../models/Timesheet';
 import * as mocks from '../util/mocks';
 import ExpenseReport from '../models/ExpenseReport';
 import TimesheetTemplate from '../models/TimesheetTemplate';
+import QuestionArticle from '../models/QuestionArticle';
+import QuestionCategory from '../models/QuestionCategory';
 
 // TODO: remove
 export let mock = async (req: Request, res: Response, next: NextFunction) => {
@@ -16,6 +18,20 @@ export let mock = async (req: Request, res: Response, next: NextFunction) => {
     const timesheets = await Timesheet.deleteMany({});
     const groups = await Group.deleteMany({});
     const templates = await TimesheetTemplate.deleteMany({});
+    const articles = await QuestionArticle.deleteMany({});
+    const categories = await QuestionCategory.deleteMany({});
+
+    const articlePromises = mocks.questionArticles.map(article => {
+      const newArticle = new QuestionArticle(article);
+
+      return newArticle.save();
+    });
+
+    const categoryPromises = mocks.questionCategories.map(category => {
+      const newCategory = new QuestionCategory(category);
+
+      return newCategory.save();
+    });
 
     const templatePromises = mocks.timesheetTemplates.map(template => {
       const newTemplate = new TimesheetTemplate(template);
@@ -54,6 +70,8 @@ export let mock = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     await Promise.all([
+      articlePromises,
+      categoryPromises,
       templatePromises,
       timesheetPromises,
       userPromises,

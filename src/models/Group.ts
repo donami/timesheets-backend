@@ -46,21 +46,21 @@ groupSchema.plugin(autoIncrement.plugin, {
   field: 'id',
 });
 
-groupSchema.virtual('members', {
-  ref: 'User',
-  localField: '_id',
-  foreignField: 'group',
-});
+// groupSchema.virtual('members', {
+//   ref: 'User',
+//   localField: '_id',
+//   foreignField: 'group',
+// });
 
 const autoPopulate = function(next: any) {
-  this.populate('timesheetTemplate members');
+  this.populate('timesheetTemplate');
 
-  this.populate({
-    path: 'members',
-    populate: {
-      path: 'timesheets',
-    },
-  });
+  // this.populate({
+  //   path: 'members',
+  //   populate: {
+  //     path: 'timesheets',
+  //   },
+  // });
 
   next();
 };

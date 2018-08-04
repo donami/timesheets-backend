@@ -62,7 +62,9 @@ export let createProject = async (
 
     const savedProject = await project.save();
 
-    return res.json(savedProject);
+    const result = await Project.findOne({ _id: savedProject._id });
+
+    return res.json(result);
   } catch (error) {
     next(error);
   }

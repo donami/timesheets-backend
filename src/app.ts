@@ -26,6 +26,8 @@ dotenv.config({ path: '.env.example' });
 // Controllers (route handlers)
 import * as apiController from './controllers/api';
 import * as projectController from './controllers/project';
+import * as questionCategoryController from './controllers/question-category';
+import * as questionArticleController from './controllers/question-article';
 import * as timesheetController from './controllers/timesheet';
 import * as userController from './controllers/user';
 import * as expenseReportController from './controllers/expense-report';
@@ -45,7 +47,7 @@ const mongoUrl = MONGODB_URI;
 
 mongoose
   .connect(
-    mongoUrl,
+    mongoUrl
     // { useMongoClient: true }
   )
   .then(() => {
@@ -88,7 +90,7 @@ app.use(lusca.xssProtection(true));
 // app.use((req, res, next) => {
 //   res.locals.user = req.user;
 //   next();
-})
+// })
 // app.use((req, res, next) => {
 //   // After successful login, redirect back to the intended page
 //   if (
@@ -152,12 +154,23 @@ app.use((req: express.Request & WithAuth, res, next) => {
 //   apiController.getFacebook
 // );
 
-
 app.get('/api/projects/:id', projectController.findProject);
 app.put('/api/projects/:id', projectController.updateProject);
 app.get('/api/projects', projectController.getProjects);
 app.post('/api/projects', projectController.createProject);
 app.delete('/api/projects', projectController.removeProject);
+
+app.get('/api/question-categories/:id', questionCategoryController.find);
+app.put('/api/question-categories/:id', questionCategoryController.update);
+app.get('/api/question-categories', questionCategoryController.list);
+app.post('/api/question-categories', questionCategoryController.create);
+app.delete('/api/question-categories', questionCategoryController.remove);
+
+app.get('/api/question-articles/:id', questionArticleController.find);
+app.put('/api/question-articles/:id', questionArticleController.update);
+app.get('/api/question-articles', questionArticleController.list);
+app.post('/api/question-articles', questionArticleController.create);
+app.delete('/api/question-articles', questionArticleController.remove);
 
 app.get('/api/users/:id', userController.find);
 app.put('/api/users/:id', userController.update);

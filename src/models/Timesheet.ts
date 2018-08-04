@@ -54,7 +54,7 @@ const timesheetSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      autopopulate: { maxDepth: 5 },
+      // autopopulate: { maxDepth: 5 },
     },
   },
   { timestamps: true, usePushEach: true }
