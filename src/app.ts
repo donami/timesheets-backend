@@ -164,13 +164,13 @@ app.get('/api/question-categories/:id', questionCategoryController.find);
 app.put('/api/question-categories/:id', questionCategoryController.update);
 app.get('/api/question-categories', questionCategoryController.list);
 app.post('/api/question-categories', questionCategoryController.create);
-app.delete('/api/question-categories', questionCategoryController.remove);
+app.delete('/api/question-categories/:id', questionCategoryController.remove);
 
 app.get('/api/question-articles/:id', questionArticleController.find);
 app.put('/api/question-articles/:id', questionArticleController.update);
 app.get('/api/question-articles', questionArticleController.list);
 app.post('/api/question-articles', questionArticleController.create);
-app.delete('/api/question-articles', questionArticleController.remove);
+app.delete('/api/question-articles/:id', questionArticleController.remove);
 
 app.get('/api/users/:id', userController.find);
 app.put('/api/users/:id', userController.update);

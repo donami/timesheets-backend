@@ -3,7 +3,10 @@ import { Response, Request, NextFunction } from 'express';
 import QuestionArticle, {
   QuestionArticleModel,
 } from '../models/QuestionArticle';
-import QuestionCategory from '../models/QuestionCategory';
+import QuestionCategory, {
+  QuestionCategoryModel,
+} from '../models/QuestionCategory';
+import User from '../models/User';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   const { q: query } = req.query;
@@ -33,10 +36,11 @@ export let find = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export let create = async (req: Request, res: Response, next: NextFunction) => {
-  const { title, author, teaser, body, access, categoryId } = req.body;
+  const { title, userId, teaser, body, access, categoryId } = req.body;
 
   try {
     const category: any = await QuestionCategory.findOne({ id: categoryId });
+    const author = await User.findOne({ id: userId }).then(user => user._id);
 
     if (!category) {
       throw new Error('No category with that ID exists.');
@@ -54,16 +58,18 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
 
     category.articles.push(savedArticle._id);
 
-    const savedCategory = await category.save();
+    await category.save();
 
-    return res.json(savedCategory);
+    const result = await QuestionCategory.findOne({ id: categoryId });
+
+    return res.json(result);
   } catch (error) {
     next(error);
   }
 };
 
 export let update = async (req: Request, res: Response, next: NextFunction) => {
-  const { title, author, teaser, body, access } = req.body;
+  const { title, teaser, body, access, categoryId } = req.body;
 
   try {
     const article = <QuestionArticleModel>(
@@ -71,14 +77,26 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
     );
 
     article.title = title || article.title;
-    article.author = author || article.author;
     article.access = access || article.access;
     article.teaser = teaser || article.teaser;
     article.body = body || article.body;
 
-    const savedArticle = await article.save();
+    await article.save();
 
-    return res.json(savedArticle);
+    const category = <any>await QuestionCategory.findOne({ id: categoryId });
+
+    await QuestionCategory.update(
+      {},
+      { $pull: { articles: { $in: [article._id] } } },
+      { multi: true }
+    );
+
+    category.articles.push(article._id);
+
+    await category.save();
+
+    const result = await QuestionCategory.findOne({ id: categoryId });
+    return res.json(result);
   } catch (error) {
     next(error);
   }

@@ -47,7 +47,7 @@ export const questionCategories: any[] = [
   {
     // _id: '5b2bc67b7ee7ad2e78f35a38',
     title: 'User Management',
-    icon: 'fas fa-users',
+    icon: 'fas fa-user',
     articles: ['5b6474c61ae30b09e5f2086e', '5b6473c78f304df6f894f994'],
   },
 ];
