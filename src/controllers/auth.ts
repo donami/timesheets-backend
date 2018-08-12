@@ -8,15 +8,24 @@ export let auth = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
 
   try {
-    const user: any = await User.findOne({ email, password }).populate(
-      'timesheets'
-    );
+    const user: any = await User.findOne({ email, password });
+
+    if (!user) {
+      return res.status(403).json({
+        status: 403,
+        ok: false,
+        message: 'Email or password did not match.',
+      });
+    }
 
     const payload = {
       id: user.id,
       _id: user._id,
       email: user.email,
       role: user.role,
+      fullName: user.fullName,
+      firstname: user.firstname,
+      lastname: user.lastname,
     };
 
     const token = jwt.sign(payload, jwtConfig.secret, {
@@ -45,9 +54,7 @@ export let verify = async (req: Request, res: Response, next: NextFunction) => {
           });
         }
 
-        const user: any = await User.findOne({ email: decoded.email }).populate(
-          'timesheets'
-        );
+        const user: any = await User.findOne({ email: decoded.email });
 
         return res.json({ data: user });
       }
@@ -58,4 +65,29 @@ export let verify = async (req: Request, res: Response, next: NextFunction) => {
     success: false,
     message: 'No token provided.',
   });
+};
+
+export let clearNotifications = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = <UserModel>await User.findOne({ _id: req.user._id });
+
+    if (!user) {
+      throw new Error('Unable to find user.');
+    }
+
+    const promises = user.notifications.map(notification => {
+      notification.unread = false;
+      return notification.save();
+    });
+
+    await Promise.all(promises);
+
+    return res.json(user);
+  } catch (error) {
+    next(error);
+  }
 };

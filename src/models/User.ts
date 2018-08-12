@@ -3,6 +3,7 @@ import autoIncrement from 'mongoose-auto-increment';
 import autopopulate from 'mongoose-autopopulate';
 
 import { GroupModel } from './Group';
+import { NotificationModel } from './Notification';
 
 autoIncrement.initialize(mongoose.connection);
 
@@ -22,6 +23,7 @@ export type UserModel = mongoose.Document & {
   // timesheets: any;
   fullName: string;
   group: GroupModel;
+  notifications: NotificationModel[];
 };
 
 const userSchema = new mongoose.Schema(
@@ -56,6 +58,13 @@ const userSchema = new mongoose.Schema(
       ref: 'Group',
       autopopulate: true,
     },
+    notifications: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Notification',
+        autopopulate: true,
+      },
+    ],
   },
   {
     timestamps: true,

@@ -25,9 +25,11 @@ dotenv.config({ path: '.env.example' });
 
 // Controllers (route handlers)
 import * as apiController from './controllers/api';
+import * as logController from './controllers/log';
 import * as projectController from './controllers/project';
 import * as questionCategoryController from './controllers/question-category';
 import * as questionArticleController from './controllers/question-article';
+import * as notificationController from './controllers/notification';
 import * as timesheetController from './controllers/timesheet';
 import * as userController from './controllers/user';
 import * as expenseReportController from './controllers/expense-report';
@@ -154,11 +156,22 @@ app.use((req: express.Request & WithAuth, res, next) => {
 //   apiController.getFacebook
 // );
 
+app.get('/api/auth/clear-notifications', authController.clearNotifications);
+
+app.get('/api/logs/:id', logController.find);
+app.get('/api/logs', logController.list);
+
 app.get('/api/projects/:id', projectController.findProject);
 app.put('/api/projects/:id', projectController.updateProject);
 app.get('/api/projects', projectController.getProjects);
 app.post('/api/projects', projectController.createProject);
 app.delete('/api/projects', projectController.removeProject);
+
+app.get('/api/notifications/:id', notificationController.find);
+app.put('/api/notifications/:id', notificationController.update);
+app.get('/api/notifications', notificationController.list);
+app.post('/api/notifications', notificationController.create);
+app.delete('/api/notifications', notificationController.remove);
 
 app.get('/api/question-categories/:id', questionCategoryController.find);
 app.put('/api/question-categories/:id', questionCategoryController.update);
@@ -168,6 +181,10 @@ app.delete('/api/question-categories/:id', questionCategoryController.remove);
 
 app.get('/api/question-articles/:id', questionArticleController.find);
 app.put('/api/question-articles/:id', questionArticleController.update);
+app.put(
+  '/api/question-articles/:id/give-feedback',
+  questionArticleController.giveFeedback
+);
 app.get('/api/question-articles', questionArticleController.list);
 app.post('/api/question-articles', questionArticleController.create);
 app.delete('/api/question-articles/:id', questionArticleController.remove);
@@ -195,7 +212,7 @@ app.get('/api/timesheets/:id', timesheetController.find);
 app.put('/api/timesheets/:id', timesheetController.update);
 app.get('/api/timesheets', timesheetController.list);
 app.post('/api/timesheets', timesheetController.create);
-app.delete('/api/timesheets', timesheetController.remove);
+app.delete('/api/timesheets/:id', timesheetController.remove);
 app.post('/api/timesheets/create-timesheets', timesheetController.createMany);
 
 app.get('/api/expense-reports/:id', expenseReportController.find);

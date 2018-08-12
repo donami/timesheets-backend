@@ -40,14 +40,58 @@ export type TimesheetTemplateModel = mongoose.Document & {
     sunday: DayType;
   };
   hoursDays: {
-    monday: number;
-    tuesday: number;
-    wednesday: number;
-    thursday: number;
-    friday: number;
-    saturday: number;
-    sunday: number;
+    monday: {
+      inTime: string;
+      outTime: string;
+      break: number;
+      totalHours: number;
+    };
+    tuesday: {
+      inTime: string;
+      outTime: string;
+      break: number;
+      totalHours: number;
+    };
+    wednesday: {
+      inTime: string;
+      outTime: string;
+      break: number;
+      totalHours: number;
+    };
+    thursday: {
+      inTime: string;
+      outTime: string;
+      break: number;
+      totalHours: number;
+    };
+    friday: {
+      inTime: string;
+      outTime: string;
+      break: number;
+      totalHours: number;
+    };
+    saturday: {
+      inTime: string;
+      outTime: string;
+      break: number;
+      totalHours: number;
+    };
+    sunday: {
+      inTime: string;
+      outTime: string;
+      break: number;
+      totalHours: number;
+    };
   };
+  // hoursDays: {
+  //   monday: number;
+  //   tuesday: number;
+  //   wednesday: number;
+  //   thursday: number;
+  //   friday: number;
+  //   saturday: number;
+  //   sunday: number;
+  // };
 };
 
 const timesheetTemplateSchema = new mongoose.Schema(
@@ -83,14 +127,58 @@ const timesheetTemplateSchema = new mongoose.Schema(
       sunday: DayTypeSchema,
     },
     hoursDays: {
-      monday: Number,
-      tuesday: Number,
-      wednesday: Number,
-      thursday: Number,
-      friday: Number,
-      saturday: Number,
-      sunday: Number,
+      monday: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+      },
+      tuesday: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+      },
+      wednesday: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+      },
+      thursday: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+      },
+      friday: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+      },
+      saturday: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+      },
+      sunday: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+      },
     },
+    // hoursDays: {
+    //   monday: Number,
+    //   tuesday: Number,
+    //   wednesday: Number,
+    //   thursday: Number,
+    //   friday: Number,
+    //   saturday: Number,
+    //   sunday: Number,
+    // },
   },
   { timestamps: true, usePushEach: true }
 );

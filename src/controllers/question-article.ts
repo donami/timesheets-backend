@@ -113,3 +113,33 @@ export let remove = async (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 };
+
+export let giveFeedback = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const {
+      response,
+    }: { response: 'negative' | 'positive' | 'neutral' } = req.body;
+
+    const article = <QuestionArticleModel>await QuestionArticle.findOne({
+      id: req.params.id,
+    });
+
+    if (['negative', 'neutral', 'positive'].indexOf(response) === -1) {
+      throw new Error('Invalid feedback response type');
+    }
+
+    article.votes[response] = article.votes[response] + 1;
+
+    await article.save();
+
+    const result = await QuestionArticle.findOne({ id: req.params.id });
+
+    return res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};

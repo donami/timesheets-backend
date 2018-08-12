@@ -27,7 +27,25 @@ const dateSchema = new mongoose.Schema(
   {
     date: String,
     hours: Number,
-    expected: Number,
+    reported: {
+      type: {
+        inTime: String,
+        outTime: String,
+        break: Number,
+        totalHours: Number,
+        message: {
+          type: String,
+          required: false,
+        },
+      },
+      required: false,
+    },
+    expected: {
+      inTime: String,
+      outTime: String,
+      break: Number,
+      totalHours: Number,
+    },
   },
   { usePushEach: true }
 );
@@ -54,6 +72,7 @@ const timesheetSchema = new mongoose.Schema(
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      autopopulate: true,
       // autopopulate: { maxDepth: 5 },
     },
   },

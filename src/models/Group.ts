@@ -10,7 +10,6 @@ autoIncrement.initialize(mongoose.connection);
 export type GroupModel = mongoose.Document & {
   id: number;
   name: string;
-  members: UserModel[];
   timesheetTemplate: TimesheetTemplateModel;
   project: ProjectModel;
 };

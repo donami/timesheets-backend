@@ -6,16 +6,13 @@ import {
   TimesheetStatus,
 } from '../models/Timesheet';
 import Project, { ProjectModel } from '../models/Project';
-import User from '../models/User';
+import User, { UserModel } from '../models/User';
+import Notification, { NotificationType } from '../models/Notification';
+import Log from '../models/Log';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const timesheets = await Timesheet.find().populate({
-      path: 'owner',
-      populate: {
-        path: 'timesheets',
-      },
-    });
+    const timesheets = await Timesheet.find();
 
     return res.json(timesheets);
   } catch (error) {
@@ -55,6 +52,70 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
       await Timesheet.findOne({ id: req.params.id })
     );
 
+    // If status has been changed,
+    // a notification for the timesheet owner should be created
+    if (status && status !== timesheet.status) {
+      const user = <UserModel>await User.findOne({ _id: timesheet.owner._id });
+
+      let notification;
+      let log;
+
+      switch (status) {
+        case TimesheetStatus.Approved:
+          notification = new Notification({
+            notificationType: NotificationType.TIMESHEET_APPROVED,
+            icon: 'fas fa-check',
+            createdBy: req.user._id,
+          });
+
+          log = new Log({
+            message: `Timesheet was approved by ${req.user.fullName}`,
+            reference: { kind: 'Timesheet', item: timesheet._id },
+          });
+
+          break;
+
+        case TimesheetStatus.WaitingForApproval:
+          log = new Log({
+            message: `Timesheet was submitted for approval by ${
+              req.user.fullName
+            }`,
+            reference: { kind: 'Timesheet', item: timesheet._id },
+          });
+          break;
+
+        case TimesheetStatus.NeedsRevisement:
+          notification = new Notification({
+            notificationType: NotificationType.TIMESHEET_NEEDS_REVISEMENT,
+            icon: 'fas fa-exclamation-circle',
+            createdBy: req.user._id,
+          });
+
+          log = new Log({
+            message: `Timesheet status was changed to: Needs Revisement by ${
+              req.user.fullName
+            }`,
+            reference: { kind: 'Timesheet', item: timesheet._id },
+          });
+          break;
+
+        default:
+          break;
+      }
+
+      if (log) {
+        await log.save();
+      }
+
+      if (notification) {
+        const savedNotification = await notification.save();
+
+        user.notifications.push(savedNotification._id);
+
+        await user.save();
+      }
+    }
+
     timesheet.status = status || timesheet.status;
     timesheet.dateApproved = dateApproved || timesheet.dateApproved;
 
@@ -68,9 +129,7 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
 
     await timesheet.save();
 
-    const result = await Timesheet.findOne({ id: req.params.id }).populate(
-      'owner'
-    );
+    const result = await Timesheet.findOne({ id: req.params.id });
 
     return res.json(result);
   } catch (error) {
@@ -114,16 +173,18 @@ export let createMany = async (
         timesheet.dates.push(date);
       });
 
-      return timesheet.save().then(async createdTimesheet => {
-        project.timesheets.push(createdTimesheet._id);
-
-        return await Timesheet.findOne({ _id: createdTimesheet._id }).populate({
-          path: 'owner',
-          populate: {
-            path: 'timesheets',
-          },
-        });
+      const log = new Log({
+        message: `Timesheet was created by ${req.user.fullName}`,
+        reference: { kind: 'Timesheet', item: timesheet._id },
       });
+
+      return Promise.all([log.save(), timesheet.save()]).then(
+        async ([savedLog, createdTimesheet]) => {
+          project.timesheets.push(createdTimesheet._id);
+
+          return await Timesheet.findOne({ _id: createdTimesheet._id });
+        }
+      );
     });
 
     const result = await Promise.all(promises);
@@ -135,11 +196,6 @@ export let createMany = async (
 
     const createdTimesheets = await Timesheet.find({
       _id: { $in: createdIds },
-    }).populate({
-      path: 'owner',
-      populate: {
-        path: 'timesheets',
-      },
     });
 
     return res.json(createdTimesheets);

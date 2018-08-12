@@ -1,6 +1,7 @@
 import { TimesheetModel, TimesheetStatus } from '../models/Timesheet';
 import { UserRole } from '../models/User';
 import { ExpenseReportStatus } from '../models/ExpenseReport';
+import { NotificationType } from '../models/Notification';
 
 export const groups: any[] = [
   {
@@ -13,6 +14,22 @@ export const groups: any[] = [
     _id: '5b2bc67b7ee7ad2e78f35a38',
     name: 'First Line Support',
     project: '5b294aa07cebb86524184674',
+  },
+];
+
+export const notifications: any[] = [
+  {
+    _id: '5b69493fc396248c198e0f88',
+    message: 'Click here to find out more',
+    notificationType: NotificationType.TIMESHEET_APPROVED,
+    icon: 'fas fa-user',
+  },
+  {
+    _id: '5b69493fc396248c198e0f89',
+    message:
+      "Ours is a life of constant reruns. We're always circling back to where we'd we started, then starting all over again. Even if we don't run extra laps that day, we surely will come back for more of the same another day soon.",
+    notificationType: NotificationType.TIMESHEET_APPROVED,
+    image: 'https://react.semantic-ui.com/images/avatar/small/elliot.jpg',
   },
 ];
 
@@ -160,6 +177,7 @@ export const users = [
     password: '123',
     role: UserRole.Admin,
     group: '5b2bc67b7ee7ad2e78f35a39',
+    notifications: ['5b69493fc396248c198e0f88', '5b69493fc396248c198e0f89'],
   },
   {
     _id: '5b294c3c00cdca62587cb456',

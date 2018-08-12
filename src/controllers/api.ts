@@ -4,6 +4,7 @@ import { default as User } from '../models/User';
 import { default as Group } from '../models/Group';
 import { default as Project } from '../models/Project';
 import { default as Timesheet } from '../models/Timesheet';
+import { default as Notification } from '../models/Notification';
 import * as mocks from '../util/mocks';
 import ExpenseReport from '../models/ExpenseReport';
 import TimesheetTemplate from '../models/TimesheetTemplate';
@@ -20,11 +21,18 @@ export let mock = async (req: Request, res: Response, next: NextFunction) => {
     const templates = await TimesheetTemplate.deleteMany({});
     const articles = await QuestionArticle.deleteMany({});
     const categories = await QuestionCategory.deleteMany({});
+    const notifications = await Notification.deleteMany({});
 
     const articlePromises = mocks.questionArticles.map(article => {
       const newArticle = new QuestionArticle(article);
 
       return newArticle.save();
+    });
+
+    const notificationPromises = mocks.notifications.map(notification => {
+      const newNotification = new Notification(notification);
+
+      return newNotification.save();
     });
 
     const categoryPromises = mocks.questionCategories.map(category => {
@@ -70,6 +78,7 @@ export let mock = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     await Promise.all([
+      notificationPromises,
       articlePromises,
       categoryPromises,
       templatePromises,
