@@ -36,6 +36,7 @@ import * as expenseReportController from './controllers/expense-report';
 import * as authController from './controllers/auth';
 import * as timesheetTemplateController from './controllers/timesheet-template';
 import * as groupController from './controllers/group';
+import * as setupController from './controllers/setup';
 import { WithAuth } from './types';
 
 // API keys and Passport configuration
@@ -113,6 +114,8 @@ app.use(
   express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 })
 );
 
+app.get('/api/is-configured', setupController.isConfigured);
+app.post('/api/setup', setupController.setup);
 app.get('/api/mock', apiController.mock);
 app.post('/api/auth', authController.auth);
 app.get('/api/verify-token', authController.verify);
