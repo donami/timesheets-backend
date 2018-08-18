@@ -192,6 +192,8 @@ app.get('/api/question-articles', questionArticleController.list);
 app.post('/api/question-articles', questionArticleController.create);
 app.delete('/api/question-articles/:id', questionArticleController.remove);
 
+app.put('/api/users/:id/disable', userController.disable);
+app.put('/api/users/:id/enable', userController.enable);
 app.get('/api/users/:id', userController.find);
 app.put('/api/users/:id', userController.update);
 app.get('/api/users', userController.list);

@@ -81,6 +81,38 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+export let disable = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = <UserModel>await User.findOne({ id: req.params.id });
+
+    user.disabled = true;
+
+    const savedUser = await user.save();
+
+    return res.json(savedUser);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export let enable = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = <UserModel>await User.findOne({ id: req.params.id });
+
+    user.disabled = false;
+
+    const savedUser = await user.save();
+
+    return res.json(savedUser);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export let remove = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.body;
 

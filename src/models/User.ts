@@ -20,6 +20,7 @@ export type UserModel = mongoose.Document & {
   password: string;
   role: UserRole;
   image: string;
+  disabled: boolean;
   // timesheets: any;
   fullName: string;
   group: GroupModel;
@@ -52,6 +53,10 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       default: UserRole.User,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
     group: {
       type: mongoose.Schema.Types.ObjectId,
