@@ -62,6 +62,18 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
 
 export let remove = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const category = <QuestionCategoryModel>(
+      await QuestionCategory.findOne({ id: req.params.id })
+    );
+
+    if ((<any>category.articles).length) {
+      return res.status(400).send({
+        success: false,
+        message:
+          'Please move existing articles to another category or remove them before attempting to remove this category.',
+      });
+    }
+
     const removedCategory = await QuestionCategory.findOneAndRemove({
       id: req.params.id,
     });

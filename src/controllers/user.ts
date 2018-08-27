@@ -64,14 +64,37 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export let update = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password, role } = req.body;
+  const {
+    email,
+    password,
+    role,
+    image,
+    firstname,
+    lastname,
+    gender,
+  } = req.body;
 
   try {
+    const emailExists = <UserModel>(
+      await User.findOne({ email, id: { $ne: req.params.id } })
+    );
+
+    if (emailExists) {
+      return res.status(403).json({
+        success: false,
+        message: 'A user with that email already exists.',
+      });
+    }
+
     const user = <UserModel>await User.findOne({ id: req.params.id });
 
     user.email = email || user.email;
+    user.image = image || user.image;
+    user.firstname = firstname || user.firstname;
+    user.lastname = lastname || user.lastname;
     user.password = password || user.password;
     user.role = role || user.role;
+    user.gender = gender || user.gender;
 
     const savedUser = await user.save();
 

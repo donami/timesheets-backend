@@ -85,6 +85,10 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
 
     const category = <any>await QuestionCategory.findOne({ id: categoryId });
 
+    const previousCategory = await QuestionCategory.findOne({
+      articles: { $in: [article._id] },
+    });
+
     await QuestionCategory.update(
       {},
       { $pull: { articles: { $in: [article._id] } } },
@@ -95,7 +99,10 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
 
     await category.save();
 
-    const result = await QuestionCategory.findOne({ id: categoryId });
+    const result = await QuestionCategory.find({
+      _id: { $in: [category._id, previousCategory._id] },
+    });
+
     return res.json(result);
   } catch (error) {
     next(error);
@@ -107,6 +114,14 @@ export let remove = async (req: Request, res: Response, next: NextFunction) => {
     const removedArticle = await QuestionArticle.findOneAndRemove({
       id: req.params.id,
     });
+
+    if (removedArticle && removedArticle._id) {
+      await QuestionCategory.update(
+        {},
+        { $pull: { articles: { $in: [removedArticle._id] } } },
+        { multi: true }
+      );
+    }
 
     return res.json(removedArticle);
   } catch (error) {

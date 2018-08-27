@@ -13,6 +13,7 @@ import expressValidator from 'express-validator';
 import bluebird from 'bluebird';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
 
 import logger from './util/logger';
 import { MONGODB_URI, SESSION_SECRET } from './util/secrets';
@@ -70,9 +71,23 @@ app.set('view engine', 'pug');
 app.set('superSecret', jwtConfig.secret);
 
 app.use(compression());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(cors());
+
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, './dist/public/images/uploads');
+  },
+  filename: function(req, file, cb) {
+    cb(
+      null,
+      file.fieldname + '-' + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({ storage });
+
 app.use(expressValidator());
 app.use(
   session({
@@ -114,9 +129,13 @@ app.use(
   express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 })
 );
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.get('/api/is-configured', setupController.isConfigured);
 app.post('/api/setup', setupController.setup);
 app.get('/api/mock', apiController.mock);
+app.post('/api/auth/recover-password', authController.recoverPassword);
 app.post('/api/auth', authController.auth);
 app.get('/api/verify-token', authController.verify);
 
@@ -160,6 +179,11 @@ app.use((req: express.Request & WithAuth, res, next) => {
 // );
 
 app.get('/api/auth/clear-notifications', authController.clearNotifications);
+app.post(
+  '/api/auth/upload-profile-image',
+  upload.single('avatar'),
+  authController.uploadProfileImage
+);
 
 app.get('/api/logs/:id', logController.find);
 app.get('/api/logs', logController.list);

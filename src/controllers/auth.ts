@@ -1,5 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
 
 import jwtConfig from '../config/jwt';
 import { default as User, UserModel } from '../models/User';
@@ -15,6 +16,14 @@ export let auth = async (req: Request, res: Response, next: NextFunction) => {
         status: 403,
         ok: false,
         message: 'Email or password did not match.',
+      });
+    }
+
+    if (user.disabled) {
+      return res.status(403).json({
+        success: false,
+        message:
+          'Your account has been disabled. If this is incorrect, please contact a system administrator.',
       });
     }
 
@@ -67,6 +76,27 @@ export let verify = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+export let recoverPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = <UserModel>await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unable to find a user with that email address.',
+      });
+    }
+
+    return res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export let clearNotifications = async (
   req: Request,
   res: Response,
@@ -87,6 +117,32 @@ export let clearNotifications = async (
     await Promise.all(promises);
 
     return res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export let uploadProfileImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { user } = req;
+
+    if (!user) {
+      throw new Error('Unable to find user.');
+    }
+
+    const authedUser = <UserModel>await User.findOne({ id: user.id });
+
+    const filename = req.file.filename;
+
+    authedUser.image = filename;
+
+    const savedUser = await authedUser.save();
+
+    return res.json(savedUser);
   } catch (error) {
     next(error);
   }

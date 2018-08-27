@@ -20,6 +20,7 @@ export type UserModel = mongoose.Document & {
   password: string;
   role: UserRole;
   image: string;
+  gender: string;
   disabled: boolean;
   // timesheets: any;
   fullName: string;
@@ -49,6 +50,10 @@ const userSchema = new mongoose.Schema(
     image: {
       type: String,
       default: '',
+    },
+    gender: {
+      type: String,
+      default: 'unknown',
     },
     role: {
       type: String,
