@@ -19,11 +19,13 @@ pipeline {
         }
 
         stage('Example') {
-          def customImage = docker.build("my-image:${env.BUILD_ID}")
+            steps {
+              def customImage = docker.build("my-image:${env.BUILD_ID}")
 
-          customImage.inside {
-              sh 'make test'
-          }
+              customImage.inside {
+                  sh 'make test'
+              }
+            }
         }
 
         // stage('Building image') {
