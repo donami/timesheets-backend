@@ -9,6 +9,13 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm install'
+                sh 'npm build'
+            }
+        }
+        
+        stage('Serve') {
+            steps {
+                sh 'npm serve'
             }
         }
     }
