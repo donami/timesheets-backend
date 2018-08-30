@@ -41,7 +41,7 @@ export let mock = async (req: Request, res: Response, next: NextFunction) => {
       return newCategory.save();
     });
 
-    const templatePromises = mocks.timesheetTemplates.map(template => {
+    const templatePromises = mocks.timesheetTemplates.map((template: any) => {
       const newTemplate = new TimesheetTemplate(template);
 
       return newTemplate.save();

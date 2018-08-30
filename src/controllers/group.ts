@@ -75,7 +75,7 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const group = <GroupModel>new Group({ name, members: [] });
-    group.members = [user._id];
+    // group.members = [user._id];
     group.project = project._id;
 
     if (timesheetTemplateId) {
@@ -105,7 +105,7 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
     const group = <GroupModel>await Group.findOne({ id: req.params.id });
 
     group.name = name || group.name;
-    group.members = members || group.members;
+    // group.members = members || group.members;
 
     const savedGroup = await group.save();
 
