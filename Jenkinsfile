@@ -9,13 +9,13 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm install'
-                sh 'npm build'
+                sh 'npm run build'
             }
         }
         
         stage('Serve') {
             steps {
-                sh 'npm serve'
+                sh 'npm run serve'
             }
         }
     }
