@@ -18,14 +18,13 @@ pipeline {
             }
         }
 
-        stage('Example') {
-            steps {
-              def customImage = docker.build("my-image:${env.BUILD_ID}")
-
-              customImage.inside {
-                  sh 'make test'
-              }
-            }
+        stage('Deploy'){
+          steps {
+            sh 'docker build -t react-app --no-cache .'
+            // sh 'docker tag react-app donami/react-app'
+            // sh 'docker push donami/react-app'
+            // sh 'docker rmi -f react-app donami/react-app'
+          }
         }
 
         // stage('Building image') {
@@ -46,14 +45,7 @@ pipeline {
         //   }
         // }
 
-        // stage('Deploy'){
-        //   steps {
-        //     sh 'docker build -t react-app --no-cache .'
-        //     sh 'docker tag react-app donami/react-app'
-        //     sh 'docker push donami/react-app'
-        //     sh 'docker rmi -f react-app donami/react-app'
-        //   }
-        // }
+
 
         // stage('Serve') {
         //     steps {
