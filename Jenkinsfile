@@ -18,23 +18,31 @@ pipeline {
             }
         }
 
-        stage('Building image') {
-          steps{
-            script {
-              dockerImage = docker.build registry + ':$BUILD_NUMBER'
-            }
+        stage('Example') {
+          def customImage = docker.build("my-image:${env.BUILD_ID}")
+
+          customImage.inside {
+              sh 'make test'
           }
         }
 
-        stage('Deploy Image') {
-          steps {
-            script {
-              docker.withRegistry('', registryCredential ) {
-                dockerImage.push()
-              }
-            }
-          }
-        }
+        // stage('Building image') {
+        //   steps{
+        //     script {
+        //       dockerImage = docker.build registry + ':$BUILD_NUMBER'
+        //     }
+        //   }
+        // }
+
+        // stage('Deploy Image') {
+        //   steps {
+        //     script {
+        //       docker.withRegistry('', registryCredential ) {
+        //         dockerImage.push()
+        //       }
+        //     }
+        //   }
+        // }
 
         // stage('Deploy'){
         //   steps {
