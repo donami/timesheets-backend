@@ -76,7 +76,7 @@ app.use(cors());
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(undefined, './');
+    cb(undefined, './dist/public/images');
     // if (ENVIRONMENT === 'production') {
     //   cb(undefined, './public/images/uploads');
     // } else {
