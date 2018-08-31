@@ -4,6 +4,7 @@ import multer from 'multer';
 
 import jwtConfig from '../config/jwt';
 import { default as User, UserModel } from '../models/User';
+import Mailer from '../util/mailer';
 
 export let auth = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
@@ -90,6 +91,14 @@ export let recoverPassword = async (
         message: 'Unable to find a user with that email address.',
       });
     }
+
+    const mailer = new Mailer();
+
+    mailer.configure({
+      to: [user.email],
+      ...mailer.getTemplate('FORGOTTEN_PASSWORD', user),
+    });
+    mailer.send();
 
     return res.json(user);
   } catch (error) {
