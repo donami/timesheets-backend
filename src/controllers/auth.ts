@@ -1,10 +1,11 @@
 import { Response, Request, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import multer from 'multer';
+import { v4 as uuid } from 'node-uuid';
 
 import jwtConfig from '../config/jwt';
 import { default as User, UserModel } from '../models/User';
 import Mailer from '../util/mailer';
+import PasswordReset from '../models/PasswordReset';
 
 export let auth = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
@@ -77,6 +78,33 @@ export let verify = async (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
+export let verifyRecoverPasswordCode = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const isValid = await PasswordReset.findOne({
+      userId: req.query.userId,
+      code: req.query.code,
+    });
+
+    if (!isValid) {
+      return res.status(403).json({
+        success: false,
+        message: 'Recover code does not exist or has expired.',
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Recover code is valid.',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export let recoverPassword = async (
   req: Request,
   res: Response,
@@ -92,15 +120,59 @@ export let recoverPassword = async (
       });
     }
 
+    const code = uuid();
+
+    const passwordReset = new PasswordReset({ userId: user.id, code });
+    await passwordReset.save();
+
     const mailer = new Mailer();
 
     mailer.configure({
       to: [user.email],
-      ...mailer.getTemplate('FORGOTTEN_PASSWORD', user),
+      ...mailer.getTemplate('FORGOTTEN_PASSWORD', user, code),
     });
     mailer.send();
 
     return res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export let recoverPasswordChange = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id, password, code } = req.body;
+
+  try {
+    const validCode = await PasswordReset.findOne({
+      userId: id,
+      code,
+    });
+
+    const user = <UserModel>await User.findOne({ id });
+
+    if (!validCode) {
+      return res.status(403).json({
+        success: false,
+        message: 'Password recovery code does not exist or has expired.',
+      });
+    }
+
+    if (!password) {
+      throw new Error('No password provided.');
+    }
+
+    // Update password
+    user.password = password;
+    const savedUser = await user.save();
+
+    // Remove code after usage
+    await validCode.remove();
+
+    return res.json(savedUser);
   } catch (error) {
     next(error);
   }

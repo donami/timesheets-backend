@@ -135,6 +135,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/api/is-configured', setupController.isConfigured);
 app.post('/api/setup', setupController.setup);
 app.get('/api/mock', apiController.mock);
+app.get(
+  '/api/auth/verify-recover-code',
+  authController.verifyRecoverPasswordCode
+);
+app.post(
+  '/api/auth/recover-password-change',
+  authController.recoverPasswordChange
+);
 app.post('/api/auth/recover-password', authController.recoverPassword);
 app.post('/api/auth', authController.auth);
 app.get('/api/verify-token', authController.verify);
