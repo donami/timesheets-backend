@@ -16,7 +16,7 @@ import jwt from 'jsonwebtoken';
 import multer from 'multer';
 
 import logger from './util/logger';
-import { MONGODB_URI, SESSION_SECRET } from './util/secrets';
+import { MONGODB_URI, SESSION_SECRET, ENVIRONMENT } from './util/secrets';
 import jwtConfig from './config/jwt';
 
 const MongoStore = mongo(session);
@@ -76,7 +76,11 @@ app.use(cors());
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(undefined, './dist/public/images/uploads');
+    if (ENVIRONMENT === 'production') {
+      cb(undefined, './public/images/uploads');
+    } else {
+      cb(undefined, './dist/public/images/uploads');
+    }
   },
   filename: function(req, file, cb) {
     cb(
