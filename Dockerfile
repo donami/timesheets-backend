@@ -1,5 +1,3 @@
-# FROM debian:wheezy
-
 # Extending image
 FROM node:carbon
 
