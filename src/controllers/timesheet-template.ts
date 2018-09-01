@@ -99,14 +99,12 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export let remove = async (req: Request, res: Response, next: NextFunction) => {
-  const { tempateId } = req.body;
-
   try {
-    const removedTimesheetTemplate = await TimesheetTemplate.findOneAndRemove({
-      id: tempateId,
+    const removedTemplate = await TimesheetTemplate.findOneAndRemove({
+      id: req.params.id,
     });
 
-    return res.json(removedTimesheetTemplate);
+    return res.json(removedTemplate);
   } catch (error) {
     next(error);
   }

@@ -236,7 +236,7 @@ app.get('/api/timesheet-templates/:id', timesheetTemplateController.find);
 app.put('/api/timesheet-templates/:id', timesheetTemplateController.update);
 app.get('/api/timesheet-templates', timesheetTemplateController.list);
 app.post('/api/timesheet-templates', timesheetTemplateController.create);
-app.delete('/api/timesheet-templates', timesheetTemplateController.remove);
+app.delete('/api/timesheet-templates/:id', timesheetTemplateController.remove);
 
 app.put('/api/groups/update-group-member', groupController.updateGroupMember);
 app.get('/api/groups/:id', groupController.find);
