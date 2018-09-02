@@ -76,7 +76,8 @@ app.use(cors());
 
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(undefined, './dist/public/images/uploads');
+    // cb(undefined, './dist/public/images/uploads');
+    cb(undefined, './uploads');
   },
   filename: function(req, file, cb) {
     cb(
@@ -105,25 +106,13 @@ app.use(passport.session());
 app.use(flash());
 app.use(lusca.xframe('SAMEORIGIN'));
 app.use(lusca.xssProtection(true));
-// app.use((req, res, next) => {
-//   res.locals.user = req.user;
-//   next();
-// })
-// app.use((req, res, next) => {
-//   // After successful login, redirect back to the intended page
-//   if (
-//     !req.user &&
-//     req.path !== '/login' &&
-//     req.path !== '/signup' &&
-//     !req.path.match(/^\/auth/) &&
-//     !req.path.match(/\./)
-//   ) {
-//     req.session.returnTo = req.path;
-//   } else if (req.user && req.path == '/account') {
-//     req.session.returnTo = req.path;
-//   }
-//   next();
-// });
+
+app.use(
+  '/static/uploads',
+  express.static(path.join(path.resolve(__dirname, '..'), 'uploads'), {
+    maxAge: 31557600000,
+  })
+);
 
 app.use(
   express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 })
@@ -176,15 +165,8 @@ app.use((req: express.Request & WithAuth, res, next) => {
 });
 
 /**
- * API examples routes.
+ * API routes that requires a token.
  */
-// app.get('/api', apiController.getApi);
-// app.get(
-//   '/api/facebook',
-//   passportConfig.isAuthenticated,
-//   passportConfig.isAuthorized,
-//   apiController.getFacebook
-// );
 
 app.get('/api/auth/clear-notifications', authController.clearNotifications);
 app.post(
