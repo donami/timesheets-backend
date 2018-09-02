@@ -99,17 +99,36 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export let update = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, members } = req.body;
+  const { name, timesheetTemplate: templateId, project: projectId } = req.body;
 
   try {
     const group = <GroupModel>await Group.findOne({ id: req.params.id });
 
+    const previousProject = await Project.findOne({ _id: group.project });
+
+    if (templateId) {
+      const template = await TimesheetTemplate.findOne({ id: templateId });
+
+      if (template) {
+        group.timesheetTemplate = template._id;
+      }
+    }
+
+    if (projectId) {
+      const project = await Project.findOne({ id: projectId });
+
+      if (project) {
+        group.project = project._id;
+      }
+    }
+
     group.name = name || group.name;
-    // group.members = members || group.members;
 
     const savedGroup = await group.save();
 
-    const result = await Group.findOne({ id: savedGroup.id });
+    const result = await Project.find({
+      _id: { $in: [previousProject._id, savedGroup.project._id] },
+    });
 
     return res.json(result);
   } catch (error) {

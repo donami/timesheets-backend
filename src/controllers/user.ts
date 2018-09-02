@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from 'express';
 
 import { default as User, UserModel, UserRole } from '../models/User';
 import Project from '../models/Project';
+import Group from '../models/Group';
 
 export let list = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -31,16 +32,25 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
     password,
     role,
     projects: projectIds,
+    group: groupId,
   } = req.body;
 
   try {
-    const user = new User({
+    const user = <UserModel>new User({
       email,
       password,
       firstname,
       lastname,
       role: role || UserRole.User,
     });
+
+    if (groupId) {
+      const group = await Group.findOne({ id: groupId });
+
+      if (group) {
+        user.group = group._id;
+      }
+    }
 
     const savedUser = await user.save();
 
@@ -57,7 +67,9 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
 
     await Promise.all(projectPromises);
 
-    return res.json(savedUser);
+    const result = await User.findOne({ _id: savedUser._id });
+
+    return res.json(result);
   } catch (error) {
     next(error);
   }
@@ -72,6 +84,7 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
     firstname,
     lastname,
     gender,
+    group: groupId,
   } = req.body;
 
   try {
@@ -87,6 +100,14 @@ export let update = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const user = <UserModel>await User.findOne({ id: req.params.id });
+
+    if (groupId) {
+      const group = await Group.findOne({ id: groupId });
+
+      if (group) {
+        user.group = group._id;
+      }
+    }
 
     user.email = email || user.email;
     user.image = image || user.image;
