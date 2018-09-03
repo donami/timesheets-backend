@@ -82,7 +82,7 @@ export let updateProject = async (
 
     const project = <ProjectModel>await Project.findOne({
       id: req.params.id,
-      'members.user': { $in: user._id },
+      // 'members.user': { $in: user._id },
     });
 
     project.name = name;
@@ -100,12 +100,10 @@ export let removeProject = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { projectId } = req.body;
-
   try {
     const removedProject = await Project.findOneAndRemove({
-      id: projectId,
-      'members.user': { $in: req.user._id },
+      id: req.params.id,
+      // 'members.user': { $in: req.user._id },
     });
 
     return res.json(removedProject);

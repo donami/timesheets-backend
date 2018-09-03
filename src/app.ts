@@ -182,7 +182,7 @@ app.get('/api/projects/:id', projectController.findProject);
 app.put('/api/projects/:id', projectController.updateProject);
 app.get('/api/projects', projectController.getProjects);
 app.post('/api/projects', projectController.createProject);
-app.delete('/api/projects', projectController.removeProject);
+app.delete('/api/projects/:id', projectController.removeProject);
 
 app.get('/api/notifications/:id', notificationController.find);
 app.put('/api/notifications/:id', notificationController.update);
