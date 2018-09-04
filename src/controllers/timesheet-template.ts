@@ -36,16 +36,6 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
     hoursDays,
   } = req.body;
 
-  // const parsedHoursDays = {
-  //   monday: hoursDays.monday.totalHours,
-  //   tuesday: hoursDays.tuesday.totalHours,
-  //   wednesday: hoursDays.wednesday.totalHours,
-  //   thursday: hoursDays.thursday.totalHours,
-  //   friday: hoursDays.friday.totalHours,
-  //   saturday: hoursDays.saturday.totalHours,
-  //   sunday: hoursDays.sunday.totalHours,
-  // };
-
   try {
     const template = new TimesheetTemplate({
       name,
@@ -55,7 +45,6 @@ export let create = async (req: Request, res: Response, next: NextFunction) => {
       reportType,
       startEndDays,
       hoursDays,
-      // hoursDays: parsedHoursDays,
     });
 
     const savedTemplate = await template.save();

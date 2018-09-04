@@ -45,42 +45,49 @@ export type TimesheetTemplateModel = mongoose.Document & {
       outTime: string;
       break: number;
       totalHours: number;
+      holiday: boolean;
     };
     tuesday: {
       inTime: string;
       outTime: string;
       break: number;
       totalHours: number;
+      holiday: boolean;
     };
     wednesday: {
       inTime: string;
       outTime: string;
       break: number;
       totalHours: number;
+      holiday: boolean;
     };
     thursday: {
       inTime: string;
       outTime: string;
       break: number;
       totalHours: number;
+      holiday: boolean;
     };
     friday: {
       inTime: string;
       outTime: string;
       break: number;
       totalHours: number;
+      holiday: boolean;
     };
     saturday: {
       inTime: string;
       outTime: string;
       break: number;
       totalHours: number;
+      holiday: boolean;
     };
     sunday: {
       inTime: string;
       outTime: string;
       break: number;
       totalHours: number;
+      holiday: boolean;
     };
   };
   // hoursDays: {
@@ -132,42 +139,70 @@ const timesheetTemplateSchema = new mongoose.Schema(
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
       },
       tuesday: {
         inTime: String,
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
       },
       wednesday: {
         inTime: String,
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
       },
       thursday: {
         inTime: String,
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
       },
       friday: {
         inTime: String,
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
       },
       saturday: {
         inTime: String,
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
       },
       sunday: {
         inTime: String,
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
       },
     },
     // hoursDays: {

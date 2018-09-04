@@ -33,6 +33,10 @@ const dateSchema = new mongoose.Schema(
         outTime: String,
         break: Number,
         totalHours: Number,
+        holiday: {
+          type: Boolean,
+          default: false,
+        },
         message: {
           type: String,
           required: false,
@@ -45,6 +49,10 @@ const dateSchema = new mongoose.Schema(
       outTime: String,
       break: Number,
       totalHours: Number,
+      holiday: {
+        type: Boolean,
+        default: false,
+      },
     },
   },
   { usePushEach: true }
