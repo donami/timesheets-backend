@@ -13,6 +13,7 @@ export interface ExpenseLineItem {
   amount: number;
   currency: string;
   attachment?: string;
+  files: string[];
 }
 
 export enum ExpenseReportStatus {
@@ -41,9 +42,18 @@ const expenseReportSchema = new mongoose.Schema(
         amount: Number,
         currency: String,
         attachment: String,
+        files: [
+          {
+            type: String,
+            default: [],
+          },
+        ],
       },
     ],
-    dateSubmitted: String,
+    dateSubmitted: {
+      type: Date,
+      default: Date.now,
+    },
     dateApproved: String,
     status: {
       type: String,

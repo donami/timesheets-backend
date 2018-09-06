@@ -239,5 +239,20 @@ app.put('/api/expense-reports/:id', expenseReportController.update);
 app.get('/api/expense-reports', expenseReportController.list);
 app.post('/api/expense-reports', expenseReportController.create);
 app.delete('/api/expense-reports', expenseReportController.remove);
+app.post(
+  '/api/expense-reports/line-item-upload',
+  upload.array('files'),
+  (req: any, res: any, next: any) => {
+    const files = req.files.map((file: any) => file.filename);
+    const { previousFiles = [] } = req.body;
+
+    const item = {
+      ...req.body,
+      files: files.concat(previousFiles),
+    };
+
+    return res.json(item);
+  }
+);
 
 export default app;
